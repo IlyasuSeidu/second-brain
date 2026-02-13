@@ -10,10 +10,12 @@ datasource db {
 enum IntentType {
   TASK
   IDEA
+  PROBLEM
+  GOAL
+  REMINDER
+  REFLECTION
   NOTE
   QUESTION
-  REFLECTION
-  REMINDER
   PROJECT
   OTHER
 }
