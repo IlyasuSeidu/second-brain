@@ -1,0 +1,11 @@
+{
+  "name": "@second-brain/config",
+  "private": true,
+  "version": "0.1.0",
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./eslint/base": "./eslint/base.cjs",
+    "./eslint/node": "./eslint/node.cjs",
+    "./eslint/react-native": "./eslint/react-native.cjs"
+  }
+}

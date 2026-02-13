@@ -1,0 +1,16 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node", "jest"],
+    "paths": {
+      "@second-brain/shared": ["../../packages/shared/src"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["dist"]
+}

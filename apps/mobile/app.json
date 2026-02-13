@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "BrainDumb",
+    "slug": "brain-dumb",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {},
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
+    "types": ["react", "react-native"],
+    "paths": {
+      "@second-brain/shared": ["../../packages/shared/src"]
+    }
+  },
+  "include": ["App.tsx", "index.ts", "expo-env.d.ts"]
+}

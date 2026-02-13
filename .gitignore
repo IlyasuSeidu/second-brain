@@ -1,0 +1,20 @@
+node_modules
+.pnpm-store
+
+# Build output
+dist
+coverage
+
+# Expo
+.expo
+.expo-shared
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+.idea
+.vscode

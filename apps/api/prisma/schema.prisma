@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum IntentType {
+  TASK
+  IDEA
+  NOTE
+  QUESTION
+  REFLECTION
+  REMINDER
+  PROJECT
+  OTHER
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ThoughtStatus {
+  CAPTURED
+  PLANNED
+  COMPLETED
+  ARCHIVED
+}
+
+enum EnergyRequired {
+  LOW
+  MEDIUM
+  HIGH
+  DEEP_WORK
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  CANCELLED
+}
+
+enum ThoughtEventType {
+  CREATED
+  UPDATED
+  REMINDER_SENT
+  COMPLETED
+  RESURFACED
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique @db.VarChar(320)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  thoughts Thought[]
+
+  @@map("users")
+}
+
+model Thought {
+  id             String         @id @default(uuid()) @db.Uuid
+  userId         String         @db.Uuid
+  originalText   String         @db.Text
+  cleanedText    String?        @db.Text
+  intentType     IntentType
+  category       String?        @db.VarChar(120)
+  emotionalTone  String?        @db.VarChar(80)
+  urgencyLevel   UrgencyLevel   @default(MEDIUM)
+  status         ThoughtStatus  @default(CAPTURED)
+  energyRequired EnergyRequired @default(MEDIUM)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
+
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reminders          Reminder[]
+  executionPlan      ExecutionPlan?
+  thoughtEvents      ThoughtEvent[]
+  resurfacingSignals ResurfacingSignal[]
+  aiLogs             AiLog[]
+
+  @@index([userId], map: "idx_thought_user_id")
+  @@index([status], map: "idx_thought_status")
+  @@index([createdAt], map: "idx_thought_created_at")
+  @@map("thoughts")
+}
+
+model Reminder {
+  id           String         @id @default(uuid()) @db.Uuid
+  thoughtId    String         @db.Uuid
+  scheduledFor DateTime       @db.Timestamptz(3)
+  sentAt       DateTime?      @db.Timestamptz(3)
+  status       ReminderStatus @default(PENDING)
+  createdAt    DateTime       @default(now()) @db.Timestamptz(3)
+
+  thought Thought @relation(fields: [thoughtId], references: [id], onDelete: Cascade)
+
+  @@index([thoughtId], map: "idx_reminder_thought_id")
+  @@index([scheduledFor], map: "idx_reminder_scheduled_for")
+  @@index([status], map: "idx_reminder_status")
+  @@map("reminders")
+}
+
+model ExecutionPlan {
+  id        String   @id @default(uuid()) @db.Uuid
+  thoughtId String   @unique @db.Uuid
+  planJson  Json     @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  thought Thought @relation(fields: [thoughtId], references: [id], onDelete: Cascade)
+
+  @@map("execution_plans")
+}
+
+model ThoughtEvent {
+  id        String           @id @default(uuid()) @db.Uuid
+  thoughtId String           @db.Uuid
+  eventType ThoughtEventType
+  metadata  Json?            @db.JsonB
+  createdAt DateTime         @default(now()) @db.Timestamptz(3)
+
+  thought Thought @relation(fields: [thoughtId], references: [id], onDelete: Cascade)
+
+  @@index([thoughtId], map: "idx_thought_event_thought_id")
+  @@index([eventType], map: "idx_thought_event_type")
+  @@map("thought_events")
+}
+
+model ResurfacingSignal {
+  id              String   @id @default(uuid()) @db.Uuid
+  thoughtId       String   @db.Uuid
+  score           Float
+  reason          String   @db.VarChar(255)
+  lastEvaluatedAt DateTime @db.Timestamptz(3)
+
+  thought Thought @relation(fields: [thoughtId], references: [id], onDelete: Cascade)
+
+  @@index([thoughtId], map: "idx_resurfacing_signal_thought_id")
+  @@map("resurfacing_signals")
+}
+
+model AiLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  thoughtId String?  @db.Uuid
+  prompt    String   @db.Text
+  response  String   @db.Text
+  model     String   @db.VarChar(120)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  thought Thought? @relation(fields: [thoughtId], references: [id], onDelete: SetNull)
+
+  @@index([thoughtId], map: "idx_ai_log_thought_id")
+  @@map("ai_logs")
+}
